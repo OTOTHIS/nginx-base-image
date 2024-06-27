@@ -3,18 +3,19 @@ phases:
   install:
     on-failure: ABORT 
     runtime-versions:
-      php: 8.2
-    commands:
-      - echo "install"
+      php: 8.2"
   pre_build:
     on-failure: ABORT
     commands:
-      - echo "pre_build"
+      - echo "login to aws ...."
+      - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin $REPOSITORY
   build:
     on-failure: ABORT
     commands:
-      - echo "build"
+      - docker build -t $IMAGE .
+      - docker tag $IMAGE:$IMAGE_TAG $REPOSITORY/$IMAGE:$IMAGE_TAG
   post_build:
     on-failure: ABORT
     commands:
-      - echo "post_build"
+      - docker images ls -a
+      - docker push $REPOSITORY/$IMAGE:$IMAGE_TAG
